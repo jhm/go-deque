@@ -4,35 +4,35 @@ package deque
 const DefaultDequeSize = 16
 
 // A double-ended queue.
-type deque[T any] struct {
+type Deque[T any] struct {
 	elements   []T
 	head, tail int
 }
 
 // New returns a new deque with the default size.
-func New[T any]() *deque[T] {
+func New[T any]() *Deque[T] {
 	return NewWithSize[T](DefaultDequeSize)
 }
 
 // NewWithSize returns a new deque with the given initial size (rounded up to
 // the nearest greater power of 2).
-func NewWithSize[T any](initialSize int) *deque[T] {
+func NewWithSize[T any](initialSize int) *Deque[T] {
 	size := nextPowerOf2(initialSize)
-	return &deque[T]{elements: make([]T, size)}
+	return &Deque[T]{elements: make([]T, size)}
 }
 
 // IsEmpty returns true iff the queue has no items in it.
-func (d *deque[T]) IsEmpty() bool {
+func (d *Deque[T]) IsEmpty() bool {
 	return d.head == d.tail
 }
 
 // Len returns the number of elements in the queue.
-func (d *deque[T]) Len() int {
+func (d *Deque[T]) Len() int {
 	return (d.tail - d.head) & (len(d.elements) - 1)
 }
 
 // AddFirst adds an element to the front of the queue.
-func (d *deque[T]) AddFirst(element T) {
+func (d *Deque[T]) AddFirst(element T) {
 	d.head = (d.head - 1) & (len(d.elements) - 1)
 	d.elements[d.head] = element
 	if d.head == d.tail {
@@ -41,7 +41,7 @@ func (d *deque[T]) AddFirst(element T) {
 }
 
 // AddLast adds an element to the end of the queue.
-func (d *deque[T]) AddLast(element T) {
+func (d *Deque[T]) AddLast(element T) {
 	d.elements[d.tail] = element
 	d.tail = (d.tail + 1) & (len(d.elements) - 1)
 	if d.head == d.tail {
@@ -52,7 +52,7 @@ func (d *deque[T]) AddLast(element T) {
 // PeekFirst returns the element at the front of the queue and a bool indicating
 // that an element was found. The zero value for type T and false will be
 // returned when there are no elements in the queue.
-func (d *deque[T]) PeekFirst() (T, bool) {
+func (d *Deque[T]) PeekFirst() (T, bool) {
 	if d.IsEmpty() {
 		return zero[T](), false
 	}
@@ -62,7 +62,7 @@ func (d *deque[T]) PeekFirst() (T, bool) {
 // PeekLast returns the element at the end of the queue and a bool indicating
 // that an element was found. The zero value for type T and false will be
 // returned when there are no elements in the queue.
-func (d *deque[T]) PeekLast() (T, bool) {
+func (d *Deque[T]) PeekLast() (T, bool) {
 	if d.IsEmpty() {
 		return zero[T](), false
 	}
@@ -72,7 +72,7 @@ func (d *deque[T]) PeekLast() (T, bool) {
 // RemoveFirst removes the element at the front of the queue and returns it and
 // a bool value indicating that an element was found. The zero value for type T
 // and false will be returned when there are no elements in the queue.
-func (d *deque[T]) RemoveFirst() (T, bool) {
+func (d *Deque[T]) RemoveFirst() (T, bool) {
 	if d.IsEmpty() {
 		return zero[T](), false
 	}
@@ -85,7 +85,7 @@ func (d *deque[T]) RemoveFirst() (T, bool) {
 // RemoveLast removes the element at the end of the queue and returns it and a
 // bool value indicating that an element was found. The zero value for type T
 // and false will be returned when there are no elements in the queue.
-func (d *deque[T]) RemoveLast() (T, bool) {
+func (d *Deque[T]) RemoveLast() (T, bool) {
 	if d.IsEmpty() {
 		return zero[T](), false
 	}
@@ -98,11 +98,11 @@ func (d *deque[T]) RemoveLast() (T, bool) {
 
 // AsSlice returns a slice that includes all the elements in the deque in the
 // order they would be returned from repeated calls to RemoveFirst.
-func (d *deque[T]) AsSlice() []T {
+func (d *Deque[T]) AsSlice() []T {
 	return d.copyToSliceWithSize(d.Len())
 }
 
-func (d *deque[T]) grow() {
+func (d *Deque[T]) grow() {
 	newSize := len(d.elements) << 1
 	xs := d.copyToSliceWithSize(newSize)
 	newTail := len(d.elements)
@@ -111,7 +111,7 @@ func (d *deque[T]) grow() {
 	d.tail = newTail
 }
 
-func (d *deque[T]) copyToSliceWithSize(size int) []T {
+func (d *Deque[T]) copyToSliceWithSize(size int) []T {
 	xs := make([]T, size)
 	if d.head < d.tail {
 		copy(xs, d.elements[d.head:d.tail])
